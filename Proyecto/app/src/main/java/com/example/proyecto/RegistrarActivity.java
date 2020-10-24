@@ -5,44 +5,64 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
+
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class RegistrarActivity extends AppCompatActivity {
 
-    private EditText editTextNombre, editTextApellido, editTextDni, editTextEmail,
-            editTextPassword, editTextComs;
+    private List<TextView> textsViews;
+    private List<EditText> editsText;
+    private static final int LONG_MIN_PASS = 8;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registrar);
 
-        editTextApellido = (EditText) findViewById(R.id.editTextApellido);
-        editTextNombre = (EditText) findViewById(R.id.editTextNombre);
-        editTextDni = (EditText) findViewById(R.id.editTextTextDni);
-        editTextEmail = (EditText) findViewById(R.id.editTextEmail);
-        editTextPassword = (EditText) findViewById(R.id.editTextPassword);
-        editTextComs = (EditText) findViewById(R.id.editTextComision);
+        textsViews = new ArrayList<TextView>();
+        editsText = new ArrayList<EditText>();
+
+        editsText.add((EditText) findViewById(R.id.editTextNombre));
+        editsText.add((EditText) findViewById(R.id.editTextApellido));
+        editsText.add((EditText) findViewById(R.id.editTextTextDni));
+        editsText.add((EditText) findViewById(R.id.editTextEmail));
+        editsText.add((EditText) findViewById(R.id.editTextPassword));
+        editsText.add((EditText) findViewById(R.id.editTextComision));
+
+        textsViews.add((TextView) findViewById(R.id.textViewNombre));
+        textsViews.add((TextView) findViewById(R.id.textViewApellido));
+        textsViews.add((TextView) findViewById(R.id.textViewDni));
+        textsViews.add((TextView) findViewById(R.id.textViewEmail));
+        textsViews.add((TextView) findViewById(R.id.textViewPass));
+        textsViews.add((TextView) findViewById(R.id.textViewCom));
+
     }
 
     public void eventoRegistrar(View view) {
-        if (editTextApellido.getText().toString().isEmpty()){
-            return;
-        }
-        if (editTextNombre.getText().toString().isEmpty()){
-            return;
-        }
-        if (editTextDni.getText().toString().isEmpty()){
-            return;
-        }
-        if (editTextEmail.getText().toString().isEmpty()){
-            return;
-        }
-        if (editTextPassword.getText().toString().isEmpty()){
-            return;
-        }
-        if (editTextComs.getText().toString().isEmpty()){
-            return;
+        boolean errorDatos = false;
+
+        for(int i = 0; i < editsText.size(); i++){
+            EditText actual = editsText.get(i);
+            if (actual.getText().toString().isEmpty()){
+                textsViews.get(i).setText("Completar por favor");
+                errorDatos = true;
+                } else {
+                textsViews.get(i).setText("");
+            }
         }
 
+        if (((EditText) findViewById(R.id.editTextPassword)).getText().toString().length() <= LONG_MIN_PASS) {
+            ((TextView) findViewById(R.id.textViewPass)).setText("Minimo 8 caracteres");
+            errorDatos = true;
+        }
+        if (errorDatos) return;
+
+        /*
+        * Tengo que armar el paquete de datos para el registro
+        * */
     }
 }

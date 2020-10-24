@@ -7,22 +7,21 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-
-import org.json.JSONException;
+import android.widget.TextView;
 import org.json.JSONObject;
-
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 public class MainActivity extends AppCompatActivity implements Runnable{
 
-    public EditText email;
-    public EditText passw;
-
+    private EditText editTextUsuario;
+    private EditText editTextContraseña;
+    
+    private TextView textViewUsuario;
+    private TextView textViewPassword;
+    
     private JSONObject paqueteDatos;
     private HttpURLConnection peticion;
     private URL link;
@@ -34,21 +33,39 @@ public class MainActivity extends AppCompatActivity implements Runnable{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        email = (EditText) findViewById(R.id.editTextEmail);
-        passw = (EditText) findViewById(R.id.editTextPassword);
+
+        editTextUsuario = (EditText) findViewById(R.id.editTextEmail);
+        editTextContraseña = (EditText) findViewById(R.id.editTextContraseña);
+
+        textViewUsuario = (TextView) findViewById(R.id.textViewEmail);
+        textViewPassword = (TextView) findViewById(R.id.textViewContraseña);
 
         paqueteDatos = new JSONObject();
         hiloConexion = new Thread(this);
     }
 
     public void eventoIngresar(View view) {
-        try {
-            paqueteDatos.put("email",email.getText().toString());
-            paqueteDatos.put("password", passw.getText().toString());
-            hiloConexion.start();
-        } catch (JSONException e) {
-            e.printStackTrace();
+        boolean camposVacios = false;
+
+        String usuario = editTextUsuario.getText().toString();
+        String pass = editTextContraseña.getText().toString();
+
+        if (usuario.isEmpty()){
+            textViewUsuario.setText("Completar por favor");
+            camposVacios = true;
+        }else{
+            textViewUsuario.setText("");
         }
+
+        if (pass.isEmpty()){
+            textViewPassword.setText("Completar por favor");
+            camposVacios = true;
+        }else{
+            textViewPassword.setText("");
+        }
+
+        if (camposVacios) return;
+
     }
 
     @Override
