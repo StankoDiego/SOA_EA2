@@ -8,26 +8,29 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import org.json.JSONException;
 import org.json.JSONObject;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class MainActivity extends AppCompatActivity implements Runnable{
+public class MainActivity extends AppCompatActivity{
 
     private EditText editTextUsuario;
     private EditText editTextContraseña;
     
     private TextView textViewUsuario;
-    private TextView textViewPassword;
+    private TextView textViewContraseña;
     
     private JSONObject paqueteDatos;
     private HttpURLConnection peticion;
     private URL link;
     private DataOutputStream salida;
     private DataInputStream entrada;
-    private Thread hiloConexion;
+
+    private static final String URI_LOGIN = "http://so-unlam.net.ar/api/api/login";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,10 +41,9 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         editTextContraseña = (EditText) findViewById(R.id.editTextContraseña);
 
         textViewUsuario = (TextView) findViewById(R.id.textViewEmail);
-        textViewPassword = (TextView) findViewById(R.id.textViewContraseña);
+        textViewContraseña = (TextView) findViewById(R.id.textViewContraseña);
 
         paqueteDatos = new JSONObject();
-        hiloConexion = new Thread(this);
     }
 
     public void eventoIngresar(View view) {
@@ -58,24 +60,27 @@ public class MainActivity extends AppCompatActivity implements Runnable{
         }
 
         if (pass.isEmpty()){
-            textViewPassword.setText("Completar por favor");
+            textViewContraseña.setText("Completar por favor");
             camposVacios = true;
         }else{
-            textViewPassword.setText("");
+            textViewContraseña.setText("");
         }
 
         if (camposVacios) return;
 
-    }
+        paqueteDatos = new JSONObject();
 
-    @Override
-    public void run() {
-        /*
-        link = new URL("http://so-unlam.net.ar/api/api/login");
-        peticion = (HttpURLConnection) link.openConnection();
-        peticion.setRequestMethod("POST");
-        peticion.connect();
-        */
+        try {
+            paqueteDatos.put("env", "PROD");
+            paqueteDatos.put("email", usuario);
+            paqueteDatos.put("password", pass);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        HiloLogin hiloLogin = new HiloLogin(URI_LOGIN, paqueteDatos);
+        hiloLogin.start();
+
     }
 
     public void eventoCrearUsuario(View view) {
