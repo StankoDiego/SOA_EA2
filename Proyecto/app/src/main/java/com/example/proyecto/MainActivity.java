@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
 
-        HiloLogin hiloLogin = new HiloLogin(URI_LOGIN, paqueteDatos);
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, "LOGIN");
         hiloLogin.start();
 
     }

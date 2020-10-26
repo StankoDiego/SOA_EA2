@@ -76,7 +76,7 @@ public class RegistrarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        HiloRegistrar hiloRegistrar = new HiloRegistrar(URI_REGISTRAR, paqueteDatos);
+        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, "REGISTRAR");
         hiloRegistrar.start();
     }
 

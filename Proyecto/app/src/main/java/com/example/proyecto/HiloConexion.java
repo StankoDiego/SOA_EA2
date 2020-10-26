@@ -11,18 +11,19 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class HiloRegistrar extends Thread {
+public class HiloConexion extends Thread {
 
 
-    private static final String TAG = "ThreadActivity";
+    private String tag;
     private int codigoRespuesta;
     private String mensajeRecibido;
     private JSONObject paquete;
     private String uri;
 
-    HiloRegistrar(String uri, JSONObject paqueteDatos) {
+    HiloConexion(String uri, JSONObject paqueteDatos, String tag) {
         this.paquete = paqueteDatos;
         this.uri = uri;
+        this.tag = tag;
     }
 
 
@@ -60,10 +61,10 @@ public class HiloRegistrar extends Thread {
             wr.close();
             urlConnection.disconnect();
         }catch (Exception e){
-            Log.i(TAG, e.toString());
+            Log.i(tag, e.toString());
             return;
         }
-        Log.i(TAG, resul.toString());
+        Log.i(tag, resul.toString());
     }
 
     private String inputToString(InputStreamReader inputStream) throws IOException {
@@ -79,7 +80,7 @@ public class HiloRegistrar extends Thread {
 
     @Override
     public void run() {
-        Log.i(TAG, "startThread");
+        Log.i(tag, "startThread");
         ejecutarPost();
     }
 }
