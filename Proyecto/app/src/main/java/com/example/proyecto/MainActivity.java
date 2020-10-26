@@ -5,16 +5,15 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -25,12 +24,9 @@ public class MainActivity extends AppCompatActivity{
     private TextView textViewContraseña;
     
     private JSONObject paqueteDatos;
-    private HttpURLConnection peticion;
-    private URL link;
-    private DataOutputStream salida;
-    private DataInputStream entrada;
-
+    private Handler handlerMain;
     private static final String URI_LOGIN = "http://so-unlam.net.ar/api/api/login";
+    private static final String TAG = "MAIN";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +40,18 @@ public class MainActivity extends AppCompatActivity{
         textViewContraseña = (TextView) findViewById(R.id.textViewContraseña);
 
         paqueteDatos = new JSONObject();
+
+        this.handlerMain = new Handler(){
+            @Override
+            public void handleMessage(Message msg) {
+                Bundle datos = msg.getData();
+                Log.i(TAG, datos.getString("MENSAJE"));
+
+                Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
+                i.putExtra("MENSAJE", datos.getString("MENSAJE"));
+                startActivity(i);
+            }
+        };
     }
 
     public void eventoIngresar(View view) {
@@ -78,9 +86,8 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
 
-        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, "LOGIN");
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain);
         hiloLogin.start();
-
     }
 
     public void eventoCrearUsuario(View view) {

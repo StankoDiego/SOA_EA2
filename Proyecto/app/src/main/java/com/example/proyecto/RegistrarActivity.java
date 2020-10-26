@@ -1,27 +1,19 @@
 package com.example.proyecto;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
-import android.util.LogPrinter;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
-
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,8 +21,10 @@ public class RegistrarActivity extends AppCompatActivity {
 
     private List<TextView> textsViews;
     private List<EditText> editsText;
-    JSONObject paqueteDatos;
+    private JSONObject paqueteDatos;
+    private Handler handlerRegistar;
 
+    private static  final String TAG = "REGISTRAR";
     private static final int LONG_MIN_PASS = 8;
     private static final String URI_REGISTRAR = "http://so-unlam.net.ar/api/api/register";
 
@@ -56,6 +50,18 @@ public class RegistrarActivity extends AppCompatActivity {
         textsViews.add((TextView) findViewById(R.id.textViewPass));
         textsViews.add((TextView) findViewById(R.id.textViewCom));
 
+        this.handlerRegistar = new Handler(){
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Bundle datos = msg.getData();
+                Log.i(TAG, datos.getString("MENSAJE"));
+
+                Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
+                String mensaje = datos.getString("MENSAJE");
+                i.putExtra("MENSAJE", mensaje);
+                startActivity(i);
+            }
+        };
     }
 
     public void eventoRegistrar(View view) {
@@ -76,7 +82,7 @@ public class RegistrarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, "REGISTRAR");
+        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar);
         hiloRegistrar.start();
     }
 
