@@ -1,9 +1,11 @@
 package com.example.proyecto;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -11,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +29,8 @@ public class RegistrarActivity extends AppCompatActivity {
 
     private static  final String TAG = "REGISTRAR";
     private static final int LONG_MIN_PASS = 8;
+
+    private static final String PROYECTO = "PROYECTO";
     private static final String URI_REGISTRAR = "http://so-unlam.net.ar/api/api/register";
 
     @Override
@@ -52,14 +57,24 @@ public class RegistrarActivity extends AppCompatActivity {
 
         this.handlerRegistar = new Handler(){
             @Override
-            public void handleMessage(@NonNull Message msg) {
+            public void handleMessage(Message msg) {
                 Bundle datos = msg.getData();
-                Log.i(TAG, datos.getString("MENSAJE"));
 
-                Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
-                String mensaje = datos.getString("MENSAJE");
-                i.putExtra("MENSAJE", mensaje);
-                startActivity(i);
+                try {
+                    JSONObject respuesta = new JSONObject(datos.getString("MENSAJE"));
+                    String estadoPeticion = respuesta.getString("success");
+
+                    if (estadoPeticion.equals("false")) {
+                        Toast.makeText(getApplicationContext(), "Fallo de registro", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
+                        i.putExtra("MENSAJE", datos.getString("MENSAJE"));
+                        startActivity(i);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         };
     }
@@ -82,7 +97,18 @@ public class RegistrarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
+        ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()){
+            Toast.makeText(this, "Conexion: Disponible", Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar);
+        Log.i(PROYECTO + "->" + TAG, "Comienza el thread");
         hiloRegistrar.start();
     }
 

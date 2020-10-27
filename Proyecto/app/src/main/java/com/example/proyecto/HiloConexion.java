@@ -1,5 +1,6 @@
 package com.example.proyecto;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
@@ -16,8 +17,8 @@ import java.net.URL;
 import android.os.Handler;
 
 public class HiloConexion extends Thread {
-
-    private static  final String TAG = "HILO_CONEXION";
+    private static final String PROYECTO = "PROYECTO";
+    private static final String TAG = "HILO_CONEXION";
     private JSONObject paquete;
     private String uri;
     private Handler handler;
@@ -29,6 +30,7 @@ public class HiloConexion extends Thread {
     }
 
 
+    @SuppressLint("LongLogTag")
     private synchronized void ejecutarPost() {
         HttpURLConnection urlConnection = null;
         String resul = "";
@@ -45,7 +47,7 @@ public class HiloConexion extends Thread {
             DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
             wr.write(paquete.toString().getBytes("UTF-8"));
             wr.flush();
-            Log.i("\tPETICION ENVIADA", paquete.toString());
+            Log.i(PROYECTO + "->" + "\tPETICION ENVIADO", paquete.toString());
             urlConnection.connect();
 
             int respondeCode = urlConnection.getResponseCode();
@@ -63,10 +65,10 @@ public class HiloConexion extends Thread {
             wr.close();
             urlConnection.disconnect();
         } catch (Exception e) {
-            Log.i(TAG, e.toString());
+            Log.i(PROYECTO + "->" + TAG, e.toString());
             return;
         }
-        Log.i("\tMENSAJE ENVIADA", resul);
+        Log.i(PROYECTO + "->" + "\tPAQUETE RECIBIDO", resul);
         Message msg = new Message();
         Bundle datos = new Bundle();
         datos.putString("MENSAJE", resul);
@@ -89,8 +91,8 @@ public class HiloConexion extends Thread {
 
     @Override
     public void run() {
-        Log.i(TAG, "startThread");
+        Log.i(PROYECTO + "->" + TAG, "startThread");
         ejecutarPost();
-        Log.i(TAG, "finishThread");
+        Log.i(PROYECTO + "->" + TAG, "finishThread");
     }
 }
