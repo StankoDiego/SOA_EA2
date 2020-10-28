@@ -18,9 +18,9 @@ INFORME:
 Aplicacion Android:
     []  Desarrollar el proyecto
     []  Carpetas en el repo: CODIGO(proyecto), EJECUTABLE (APK).
-    []  Desarrollar un sistema de registro de usuario y login realizando las peticiones a un servidor.
-    []  En pantallas de registro de usuario y login verificar estado de la conexion, si no hay conexion se debe informar.
-    []  Al logearse se debe informar el estado de la carga de la bateria.
+    [X]  Desarrollar un sistema de registro de usuario y login realizando las peticiones a un servidor.
+    [X]  En pantallas de registro de usuario y login verificar estado de la conexion, si no hay conexion se debe informar.
+    [X]  Al logearse se debe informar el estado de la carga de la bateria.
     []  Implementar ejecuciones en Background visto en clases.
     []  Aplicar un mecanismo de sincronizacion.
     []  Mostrar informacion del acelerometro o giroscopio ademas de otro sensor de la clase SensorManager.
