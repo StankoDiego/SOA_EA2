@@ -2,6 +2,7 @@ package com.example.proyecto;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -22,16 +23,13 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "PANTALLA PRINCIPAL";
 
-    private int TIMER_REFRESH = 300;//5 min //1800 30min;
-
     private TextView datosSensorAcelerometro;
-    private TextView textViewSensorAcelerometro;
-
-    private HiloConexion hiloPantallaPrincipal;
+    private TextView datosSensorLuz;
+    private TextView datosGiroscopo;
 
     private SensorManager mSensorManager;
-    private Sensor sensorAcelerometro;
 
+    @SuppressLint("LongLogTag")
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantalla_principal);
@@ -39,11 +37,12 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         Intent iRecibido = getIntent();
         Bundle datos = iRecibido.getExtras();
         this.mensajeRecibido = datos.getString("MENSAJE");
-        Log.i(TAG, this.mensajeRecibido);
+        Log.i(PROYECTO + "->" + TAG, this.mensajeRecibido);
         nivelBateria();
 
         datosSensorAcelerometro = (TextView) findViewById(R.id.textViewDatosAcelerometro);
-        textViewSensorAcelerometro = (TextView) findViewById(R.id.textViewAcelerometro);
+        datosSensorLuz = (TextView) findViewById(R.id.textViewLuz);
+        datosGiroscopo = (TextView) findViewById(R.id.textViewGiroscopo);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensores();
@@ -70,10 +69,60 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     @Override
     public void onSensorChanged(SensorEvent event) {
+        String txt = "";
 
-        synchronized (this){
+        synchronized (this) {
+            switch (event.sensor.getType()) {
+                case Sensor.TYPE_ACCELEROMETER:
+                    txt = "Acelerometro:\n";
+                    txt += "x: " + event.values[0] + "m/seg2\n";
+                    txt += "y: " + event.values[1] + "m/seg2\n";
+                    txt += "z: " + event.values[2] + "m/seg2\n";
+                    datosSensorAcelerometro.setText(txt);
+                    break;
+
+                case Sensor.TYPE_LIGHT:
+                    txt = "Luz ambiente: ";
+                    txt += event.values[0] + "lx";
+                    datosSensorLuz.setText(txt);
+                    break;
+
+                case Sensor.TYPE_ORIENTATION:
+                    txt = "Orientacion:\n";
+                    txt += "Acimut: " + getAcimut(event.values[0]) + "\n";
+                    txt += "y: " + event.values[1] + "\n";
+                    txt += "z: " + event.values[2] + "\n";
+                    datosGiroscopo.setText(txt);
+                    break;
+            }
 
         }
+    }
+
+
+
+    private String getAcimut(float value) {
+
+        if (value < 22.5)
+            return "N";
+        if (value >=  22.5 && value < 67.5)
+            return  "NE";
+        if (value >=  67.5 && value < 122.5)
+            return "E";
+        if (value >= 122.5 && value < 157.5)
+            return "SE";
+        if (value >= 157.5 && value < 205.5)
+            return "S";
+        if (value >= 205.5 && value < 247.5)
+            return "SO";
+        if (value >= 247.5 && value < 292.5)
+            return "O";
+        if (value >= 292.5 && value < 337.5)
+            return "NO";
+        if (value >= 337.5 && value < 360)
+            return "N";
+
+        return "Errror";
     }
 
     @Override
@@ -101,9 +150,13 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     private void detenerSensores() {
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
     private void initSensores() {
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
     }
 }
