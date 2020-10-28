@@ -7,14 +7,43 @@
     tools:context=".PantallaPrincipal">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="202dp"
-        android:layout_height="61dp"
-        android:layout_marginTop="132dp"
+        android:id="@+id/textViewDatosAcelerometro"
+        android:layout_width="280dp"
+        android:layout_height="31dp"
+        android:layout_marginTop="80dp"
         android:gravity="center"
-        android:text="HOLA"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textViewDatosOtroSensor"
+        android:layout_width="280dp"
+        android:layout_height="31dp"
+        android:layout_marginTop="60dp"
+        android:gravity="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcelerometro" />
+
+    <TextView
+        android:id="@+id/textViewAcelerometro"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/acelerometro"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDatosAcelerometro" />
+
+    <TextView
+        android:id="@+id/textViewOtroSensor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="@string/otro_sensor"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewDatosOtroSensor" />
 </androidx.constraintlayout.widget.ConstraintLayout>

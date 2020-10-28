@@ -23,7 +23,7 @@ public class HiloConexion extends Thread {
     private String uri;
     private Handler handler;
 
-    HiloConexion(String uri, JSONObject paqueteDatos, Handler handler) {
+    public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler) {
         this.paquete = paqueteDatos;
         this.uri = uri;
         this.handler = handler;

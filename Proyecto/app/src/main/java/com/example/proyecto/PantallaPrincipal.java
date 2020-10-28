@@ -2,25 +2,36 @@ package com.example.proyecto;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.annotation.SuppressLint;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class PantallaPrincipal extends AppCompatActivity {
+public class PantallaPrincipal extends AppCompatActivity implements SensorEventListener {
 
     private String mensajeRecibido;
-    private TextView textView;
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "PANTALLA PRINCIPAL";
 
-    @SuppressLint("LongLogTag")
+    private int TIMER_REFRESH = 300;//5 min //1800 30min;
+
+    private TextView datosSensorAcelerometro;
+    private TextView textViewSensorAcelerometro;
+
+    private HiloConexion hiloPantallaPrincipal;
+
+    private SensorManager mSensorManager;
+    private Sensor sensorAcelerometro;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantalla_principal);
@@ -28,9 +39,15 @@ public class PantallaPrincipal extends AppCompatActivity {
         Intent iRecibido = getIntent();
         Bundle datos = iRecibido.getExtras();
         this.mensajeRecibido = datos.getString("MENSAJE");
-        textView = (TextView) findViewById(R.id.textView);
-        Log.i(PROYECTO + "->" + TAG, this.mensajeRecibido);
+        Log.i(TAG, this.mensajeRecibido);
         nivelBateria();
+
+        datosSensorAcelerometro = (TextView) findViewById(R.id.textViewDatosAcelerometro);
+        textViewSensorAcelerometro = (TextView) findViewById(R.id.textViewAcelerometro);
+
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        initSensores();
+
     }
 
     private void nivelBateria() {
@@ -49,5 +66,44 @@ public class PantallaPrincipal extends AppCompatActivity {
         };
         IntentFilter batteryLevelFilter = new IntentFilter(Intent.ACTION_BATTERY_CHANGED);
         registerReceiver(batteryLevelReceiver, batteryLevelFilter);
+    }
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+
+        synchronized (this){
+
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initSensores();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+        initSensores();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        detenerSensores();
+    }
+
+    private void detenerSensores() {
+        mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
+    }
+
+    private void initSensores() {
+        mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
     }
 }
