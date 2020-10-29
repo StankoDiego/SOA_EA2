@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -29,6 +30,7 @@ public class MainActivity extends AppCompatActivity{
     private Handler handlerMain;
     private static final String URI_LOGIN = "http://so-unlam.net.ar/api/api/login";
     private static final String TAG = "MAIN";
+    private static final String PROYECTO = "PROYECTO";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,17 +49,19 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void handleMessage(Message msg) {
                 Bundle datos = msg.getData();
-
                 try {
                     JSONObject respuesta = new JSONObject(datos.getString("MENSAJE"));
                     String estadoPeticion = respuesta.getString("success");
 
                     if (estadoPeticion.equals("false")) {
                         Toast.makeText(getApplicationContext(), "Fallo de credenciales", Toast.LENGTH_SHORT).show();
+                        Log.i(PROYECTO + "->" + TAG, "Login fallido");
                         return;
                     } else {
                         Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
-                        i.putExtra("MENSAJE", datos.getString("MENSAJE"));
+                        //i.putExtra("MENSAJE", datos);
+                        i.putExtra("MENSAJE", datos);
+                        Log.i(PROYECTO + "->" + TAG, "Login exitoso");
                         startActivity(i);
                     }
                 } catch (JSONException e) {
@@ -109,12 +113,13 @@ public class MainActivity extends AppCompatActivity{
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
             return;
         }
-
-        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain);
+        Log.i(PROYECTO + "->" + TAG, "Se va a loguear un usuario");
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type","application/json");
         hiloLogin.start();
     }
 
     public void eventoCrearUsuario(View view) {
+        Log.i(PROYECTO + "->" + TAG, "Ingresando a pantalla de registro");
         Intent intentRegistrarActivity = new Intent(this, RegistrarActivity.class);
         startActivity(intentRegistrarActivity);
     }

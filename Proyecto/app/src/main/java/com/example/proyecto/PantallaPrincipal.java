@@ -17,9 +17,16 @@ import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.text.DateFormat;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
+
 public class PantallaPrincipal extends AppCompatActivity implements SensorEventListener {
 
-    private String mensajeRecibido;
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "PANTALLA PRINCIPAL";
 
@@ -27,7 +34,11 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     private TextView datosSensorLuz;
     private TextView datosGiroscopo;
 
+    private JSONObject paqueteDatos;
     private SensorManager mSensorManager;
+
+    private Timer timer;
+    private TimerTask refreshToken;
 
     @SuppressLint("LongLogTag")
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +46,17 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         setContentView(R.layout.activity_pantalla_principal);
 
         Intent iRecibido = getIntent();
-        Bundle datos = iRecibido.getExtras();
-        this.mensajeRecibido = datos.getString("MENSAJE");
-        Log.i(PROYECTO + "->" + TAG, this.mensajeRecibido);
+        Bundle datos = iRecibido.getBundleExtra("MENSAJE");
+
+        JSONObject datosRecibidos = null;
+        try {
+           datosRecibidos = new JSONObject(datos.getString("MENSAJE"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.i(PROYECTO + "->" + TAG, datosRecibidos.toString());
+
         nivelBateria();
 
         datosSensorAcelerometro = (TextView) findViewById(R.id.textViewDatosAcelerometro);
@@ -47,6 +66,16 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensores();
 
+        timer = new Timer();
+        refreshToken = new TimerTask() {
+            @Override
+            public void run() {
+                Date date = new Date();
+                Log.i(PROYECTO + "->" + TAG, "Actualizacion de token: " + DateFormat.getDateTimeInstance().format(date));
+                Log.i(PROYECTO + "->" + TAG, "Token anterior: " + DateFormat.getDateTimeInstance().format(date));
+            }
+        };
+        timer.schedule(refreshToken, 0, 10000);
     }
 
     private void nivelBateria() {
@@ -99,15 +128,13 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         }
     }
 
-
-
     private String getAcimut(float value) {
 
         if (value < 22.5)
             return "N";
-        if (value >=  22.5 && value < 67.5)
-            return  "NE";
-        if (value >=  67.5 && value < 122.5)
+        if (value >= 22.5 && value < 67.5)
+            return "NE";
+        if (value >= 67.5 && value < 122.5)
             return "E";
         if (value >= 122.5 && value < 157.5)
             return "SE";
@@ -146,6 +173,21 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     protected void onPause() {
         super.onPause();
         detenerSensores();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        detenerSensores();
+    }
+
+    @SuppressLint("LongLogTag")
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        refreshToken.cancel();
+        timer.cancel();
+        Log.i(PROYECTO + "->" + TAG, "Actualizacion de token finalizada");
     }
 
     private void detenerSensores() {

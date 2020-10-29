@@ -17,6 +17,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,7 +28,7 @@ public class RegistrarActivity extends AppCompatActivity {
     private JSONObject paqueteDatos;
     private Handler handlerRegistar;
 
-    private static  final String TAG = "REGISTRAR";
+    private static final String TAG = "REGISTRAR";
     private static final int LONG_MIN_PASS = 8;
 
     private static final String PROYECTO = "PROYECTO";
@@ -55,21 +56,23 @@ public class RegistrarActivity extends AppCompatActivity {
         textsViews.add((TextView) findViewById(R.id.textViewPass));
         textsViews.add((TextView) findViewById(R.id.textViewCom));
 
-        this.handlerRegistar = new Handler(){
+        this.handlerRegistar = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle datos = msg.getData();
-
                 try {
                     JSONObject respuesta = new JSONObject(datos.getString("MENSAJE"));
                     String estadoPeticion = respuesta.getString("success");
 
                     if (estadoPeticion.equals("false")) {
                         Toast.makeText(getApplicationContext(), "Fallo de registro", Toast.LENGTH_SHORT).show();
+                        Log.i(PROYECTO + "->" + TAG, "Registro fallido");
                         return;
                     } else {
                         Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
-                        i.putExtra("MENSAJE", datos.getString("MENSAJE"));
+                        //i.putExtra("MENSAJE", datos.getString("MENSAJE"));
+                        i.putExtra("MENSAJE", datos);
+                        Log.i(PROYECTO + "->" + TAG, "Registro exitoso");
                         startActivity(i);
                     }
                 } catch (JSONException e) {
@@ -97,18 +100,18 @@ public class RegistrarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()){
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
             Toast.makeText(this, "Conexion: Disponible", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar);
-        Log.i(PROYECTO + "->" + TAG, "Comienza el thread");
+        Log.i(PROYECTO + "->" + TAG, "Se va a registrar un usuario");
+        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar, "POST", "Content-Type", "application/json");
         hiloRegistrar.start();
     }
 

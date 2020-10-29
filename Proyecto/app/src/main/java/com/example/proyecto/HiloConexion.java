@@ -19,35 +19,40 @@ import android.os.Handler;
 public class HiloConexion extends Thread {
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "HILO_CONEXION";
+
     private JSONObject paquete;
     private String uri;
     private Handler handler;
+    private String accionRecibida;
+    private String key;
+    private String value;
 
-    public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler) {
+    public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler, String accion, String key, String value) {
         this.paquete = paqueteDatos;
         this.uri = uri;
         this.handler = handler;
+        this.accionRecibida = accion;
+        this.key = key;
+        this.value = value;
     }
 
-
     @SuppressLint("LongLogTag")
-    private synchronized void ejecutarPost() {
+    private synchronized void ejecutarPeticion() {
         HttpURLConnection urlConnection = null;
         String resul = "";
-
         try {
-            URL mUrl = new URL(uri);
+            URL mUrl = new URL(this.uri);
             urlConnection = (HttpURLConnection) mUrl.openConnection();
-            urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+            urlConnection.setRequestProperty(this.key, this.value + "; charset=UTF-8");
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
             urlConnection.setConnectTimeout(5000);
-            urlConnection.setRequestMethod("POST");
+            urlConnection.setRequestMethod(this.accionRecibida);
 
             DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
             wr.write(paquete.toString().getBytes("UTF-8"));
             wr.flush();
-            Log.i(PROYECTO + "->" + "\tPETICION ENVIADO", paquete.toString());
+            Log.i(PROYECTO + "->" + TAG + "->" + "PETICION ENVIADA", paquete.toString());
             urlConnection.connect();
 
             int respondeCode = urlConnection.getResponseCode();
@@ -68,7 +73,7 @@ public class HiloConexion extends Thread {
             Log.i(PROYECTO + "->" + TAG, e.toString());
             return;
         }
-        Log.i(PROYECTO + "->" + "\tPAQUETE RECIBIDO", resul);
+        Log.i(PROYECTO + "->" + TAG + "->" + "PAQUETE RECIBIDO", resul);
         Message msg = new Message();
         Bundle datos = new Bundle();
         datos.putString("MENSAJE", resul);
@@ -92,7 +97,7 @@ public class HiloConexion extends Thread {
     @Override
     public void run() {
         Log.i(PROYECTO + "->" + TAG, "startThread");
-        ejecutarPost();
+        ejecutarPeticion();
         Log.i(PROYECTO + "->" + TAG, "finishThread");
     }
 }
