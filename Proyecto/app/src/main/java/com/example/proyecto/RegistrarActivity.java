@@ -111,7 +111,7 @@ public class RegistrarActivity extends AppCompatActivity {
         }
 
         Log.i(PROYECTO + "->" + TAG, "Se va a registrar un usuario");
-        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar, "POST", "Content-Type", "application/json");
+        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar, "POST", "Content-Type", "application/json", null, null);
         hiloRegistrar.start();
     }
 

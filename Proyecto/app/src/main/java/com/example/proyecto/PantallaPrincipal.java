@@ -33,12 +33,13 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "PANTALLA PRINCIPAL";
     private static final String URI_REFRESH = "http://so-unlam.net.ar/api/api/refresh";
-
+    private static final String URI_EVENT = "http://so-unlam.net.ar/api/api/event";
     private TextView datosSensorAcelerometro;
     private TextView datosSensorLuz;
     private TextView datosGiroscopo;
 
     private Handler handlerRefresh;
+    private Handler handlerEvento;
     private JSONObject paqueteDatos;
     private SensorManager mSensorManager;
 
@@ -47,6 +48,10 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     private Timer timer;
     private TimerTask refreshToken;
+
+    private String datosLuz;
+    private String datosAcel;
+    private String datosOri;
 
     @SuppressLint("LongLogTag")
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +95,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
             public void run() {
                 Date date = new Date();
                 Log.i(PROYECTO + "->" + TAG, "Se va a actualizar el token: " + DateFormat.getDateTimeInstance().format(date) + ":" + refresh);
-                HiloConexion threadConexion = new HiloConexion(URI_REFRESH, handlerRefresh, "PUT", "Content-Type", "application/json", "Authorization", refresh);
+                HiloConexion threadConexion = new HiloConexion(URI_REFRESH, null, handlerRefresh, "PUT", "Content-Type", "application/json", "Authorization", refresh);
                 threadConexion.start();
             }
         };
@@ -112,6 +117,28 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                             Log.i(PROYECTO + "->" + TAG, "Refresh exitoso");
                             token = respuesta.getString("token");
                             tokenRefresh = respuesta.getString("token_refresh");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        this.handlerEvento = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                synchronized (this) {
+                    Bundle datos = msg.getData();
+                    try {
+                        JSONObject respuesta = new JSONObject(datos.getString("MENSAJE"));
+                        String estadoPeticion = respuesta.getString("success");
+
+                        if (estadoPeticion.equals("false")) {
+                            Log.i(PROYECTO + "->" + TAG, "Fallo de registro de evento");
+                            return;
+                        } else {
+                            Log.i(PROYECTO + "->" + TAG, "Registro de evento ok");
                         }
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -151,12 +178,14 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                     txt += "y: " + event.values[1] + "m/seg2\n";
                     txt += "z: " + event.values[2] + "m/seg2\n";
                     datosSensorAcelerometro.setText(txt);
+                    this.datosAcel = txt;
                     break;
 
                 case Sensor.TYPE_LIGHT:
                     txt = "Luz ambiente: ";
                     txt += event.values[0] + "lx";
                     datosSensorLuz.setText(txt);
+                    this.datosLuz = txt;
                     break;
 
                 case Sensor.TYPE_ORIENTATION:
@@ -165,6 +194,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                     txt += "y: " + event.values[1] + "\n";
                     txt += "z: " + event.values[2] + "\n";
                     datosGiroscopo.setText(txt);
+                    this.datosOri = txt;
                     break;
             }
 
@@ -238,18 +268,29 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
-    private synchronized void initSensores() {
+    private void initSensores() {
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
     }
 
-    public synchronized void eventoRegistrarOrientacion(View view) {
+    public void eventoRegistrarOrientacion(View view) {
     }
 
-    public synchronized void eventoRegistrarLuz(View view) {
+    public void eventoRegistrarLuz(View view) {
         Date date = new Date();
-        DateFormat.getDateTimeInstance().format(date);
+
+        paqueteDatos = new JSONObject();
+
+        try {
+            paqueteDatos.put("env", "TEST");
+            paqueteDatos.put("type_events", "Lectura de sensor");
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + "Datos: " + datosLuz);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        HiloConexion hiloLuz = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, "POST", "Content-Type", "application/json", "Authorization", token);
+        hiloLuz.start();
     }
 
     public void eventoRegistrarAcelerometro(View view) {

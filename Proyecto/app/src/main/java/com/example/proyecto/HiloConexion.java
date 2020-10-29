@@ -29,16 +29,7 @@ public class HiloConexion extends Thread {
     private String key2;
     private String value2;
 
-    public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler, String accion, String key, String value) {
-        this.paquete = paqueteDatos;
-        this.uri = uri;
-        this.handler = handler;
-        this.accionRecibida = accion;
-        this.key = key;
-        this.value = value;
-    }
-
-    public HiloConexion(String uri, Handler handler, String accion, String key, String value, String key2, String value2) {
+    public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler, String accion, String key, String value, String key2, String value2) {
         this.uri = uri;
         this.handler = handler;
         this.accionRecibida = accion;
@@ -46,6 +37,7 @@ public class HiloConexion extends Thread {
         this.value = value;
         this.key2 = key2;
         this.value2 = value2;
+        this.paquete = paqueteDatos;
     }
 
     @SuppressLint("LongLogTag")
@@ -57,7 +49,7 @@ public class HiloConexion extends Thread {
             urlConnection = (HttpURLConnection) mUrl.openConnection();
 
             if (key2 != null && value2 != null) {
-                urlConnection.setRequestProperty(this.key2, "Bearer" + " "+  this.value2);
+                urlConnection.setRequestProperty(this.key2, "Bearer" + " " + this.value2);
             }
 
             urlConnection.setRequestProperty(this.key, this.value);

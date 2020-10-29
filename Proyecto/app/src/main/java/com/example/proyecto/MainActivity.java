@@ -113,7 +113,7 @@ public class MainActivity extends AppCompatActivity{
             return;
         }
         Log.i(PROYECTO + "->" + TAG, "Se va a loguear un usuario");
-        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type","application/json");
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type","application/json", null, null);
         hiloLogin.start();
     }
 
