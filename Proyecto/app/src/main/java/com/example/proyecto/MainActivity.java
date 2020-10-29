@@ -59,7 +59,6 @@ public class MainActivity extends AppCompatActivity{
                         return;
                     } else {
                         Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
-                        //i.putExtra("MENSAJE", datos);
                         i.putExtra("MENSAJE", datos);
                         Log.i(PROYECTO + "->" + TAG, "Login exitoso");
                         startActivity(i);

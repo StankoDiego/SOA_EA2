@@ -8,35 +8,75 @@
     android:background="@drawable/gradient_background">
 
     <TextView
-        android:id="@+id/textViewDatosAcelerometro"
-        android:layout_width="292dp"
-        android:layout_height="127dp"
+        android:id="@+id/textViewAcelerometro"
+        android:layout_width="227dp"
+        android:layout_height="118dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="80dp"
         android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/buttonAcelerometro"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/textViewLuz"
-        android:layout_width="292dp"
-        android:layout_height="127dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="227dp"
+        android:layout_height="118dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginStart="32dp"
         android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewDatosAcelerometro" />
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcelerometro" />
 
     <TextView
-        android:id="@+id/textViewGiroscopo"
-        android:layout_width="292dp"
-        android:layout_height="127dp"
-        android:layout_marginTop="32dp"
+        android:id="@+id/textViewOrientacion"
+        android:layout_width="227dp"
+        android:layout_height="118dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="40dp"
         android:gravity="center"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewLuz" />
+
+    <Button
+        android:id="@+id/buttonAcelerometro"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="112dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_rounded"
+        android:text="Registrar\ndatos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:onClick="eventoRegistrarAcelerometro"/>
+
+    <Button
+        android:id="@+id/buttonLuz"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_rounded"
+        android:text="Registrar\ndatos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.9"
+        app:layout_constraintStart_toEndOf="@+id/textViewLuz"
+        app:layout_constraintTop_toBottomOf="@+id/buttonAcelerometro"
+        android:onClick="eventoRegistrarLuz"/>
+
+    <Button
+        android:id="@+id/buttonOrientacion"
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:layout_marginTop="100dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/button_rounded"
+        android:text="Registrar\ndatos"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.916"
+        app:layout_constraintStart_toEndOf="@+id/textViewOrientacion"
+        app:layout_constraintTop_toBottomOf="@+id/buttonLuz"
+        android:onClick="eventoRegistrarOrientacion"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

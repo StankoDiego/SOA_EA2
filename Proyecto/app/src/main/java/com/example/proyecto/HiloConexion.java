@@ -26,6 +26,8 @@ public class HiloConexion extends Thread {
     private String accionRecibida;
     private String key;
     private String value;
+    private String key2;
+    private String value2;
 
     public HiloConexion(String uri, JSONObject paqueteDatos, Handler handler, String accion, String key, String value) {
         this.paquete = paqueteDatos;
@@ -36,6 +38,16 @@ public class HiloConexion extends Thread {
         this.value = value;
     }
 
+    public HiloConexion(String uri, Handler handler, String accion, String key, String value, String key2, String value2) {
+        this.uri = uri;
+        this.handler = handler;
+        this.accionRecibida = accion;
+        this.key = key;
+        this.value = value;
+        this.key2 = key2;
+        this.value2 = value2;
+    }
+
     @SuppressLint("LongLogTag")
     private synchronized void ejecutarPeticion() {
         HttpURLConnection urlConnection = null;
@@ -43,18 +55,29 @@ public class HiloConexion extends Thread {
         try {
             URL mUrl = new URL(this.uri);
             urlConnection = (HttpURLConnection) mUrl.openConnection();
-            urlConnection.setRequestProperty(this.key, this.value + "; charset=UTF-8");
+
+            if (key2 != null && value2 != null) {
+                urlConnection.setRequestProperty(this.key2, "Bearer" + " "+  this.value2);
+            }
+
+            urlConnection.setRequestProperty(this.key, this.value);
+
+            Log.i(PROYECTO + "->" + TAG, urlConnection.getRequestProperties().toString());
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
             urlConnection.setConnectTimeout(5000);
             urlConnection.setRequestMethod(this.accionRecibida);
 
-            DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
-            wr.write(paquete.toString().getBytes("UTF-8"));
-            wr.flush();
-            Log.i(PROYECTO + "->" + TAG + "->" + "PETICION ENVIADA", paquete.toString());
-            urlConnection.connect();
 
+            if (paquete != null) {
+                DataOutputStream wr = new DataOutputStream(urlConnection.getOutputStream());
+                wr.write(paquete.toString().getBytes("UTF-8"));
+                wr.flush();
+                wr.close();
+                Log.i(PROYECTO + "->" + TAG + "->" + "PETICION ENVIADA", paquete.toString());
+            }
+
+            urlConnection.connect();
             int respondeCode = urlConnection.getResponseCode();
 
             if (respondeCode == HttpURLConnection.HTTP_OK || respondeCode == HttpURLConnection.HTTP_CREATED) {
@@ -67,7 +90,6 @@ public class HiloConexion extends Thread {
                 resul = "NO_OK";
             }
 
-            wr.close();
             urlConnection.disconnect();
         } catch (Exception e) {
             Log.i(PROYECTO + "->" + TAG, e.toString());

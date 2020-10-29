@@ -13,7 +13,10 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.BatteryManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,13 +32,18 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "PANTALLA PRINCIPAL";
+    private static final String URI_REFRESH = "http://so-unlam.net.ar/api/api/refresh";
 
     private TextView datosSensorAcelerometro;
     private TextView datosSensorLuz;
     private TextView datosGiroscopo;
 
+    private Handler handlerRefresh;
     private JSONObject paqueteDatos;
     private SensorManager mSensorManager;
+
+    private String token;
+    private String tokenRefresh;
 
     private Timer timer;
     private TimerTask refreshToken;
@@ -50,7 +58,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
         JSONObject datosRecibidos = null;
         try {
-           datosRecibidos = new JSONObject(datos.getString("MENSAJE"));
+            datosRecibidos = new JSONObject(datos.getString("MENSAJE"));
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -59,23 +67,58 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
         nivelBateria();
 
-        datosSensorAcelerometro = (TextView) findViewById(R.id.textViewDatosAcelerometro);
+        datosSensorAcelerometro = (TextView) findViewById(R.id.textViewAcelerometro);
         datosSensorLuz = (TextView) findViewById(R.id.textViewLuz);
-        datosGiroscopo = (TextView) findViewById(R.id.textViewGiroscopo);
+        datosGiroscopo = (TextView) findViewById(R.id.textViewOrientacion);
 
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensores();
+
+        this.tokenRefresh = null;
+        try {
+            this.tokenRefresh = datosRecibidos.getString("token_refresh");
+            this.token = datosRecibidos.getString("token");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        final String refresh = tokenRefresh;
 
         timer = new Timer();
         refreshToken = new TimerTask() {
             @Override
             public void run() {
                 Date date = new Date();
-                Log.i(PROYECTO + "->" + TAG, "Actualizacion de token: " + DateFormat.getDateTimeInstance().format(date));
-                Log.i(PROYECTO + "->" + TAG, "Token anterior: " + DateFormat.getDateTimeInstance().format(date));
+                Log.i(PROYECTO + "->" + TAG, "Se va a actualizar el token: " + DateFormat.getDateTimeInstance().format(date) + ":" + refresh);
+                HiloConexion threadConexion = new HiloConexion(URI_REFRESH, handlerRefresh, "PUT", "Content-Type", "application/json", "Authorization", refresh);
+                threadConexion.start();
             }
         };
-        timer.schedule(refreshToken, 0, 10000);
+        timer.schedule(refreshToken, 60000, 180000);
+
+        this.handlerRefresh = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                synchronized (this) {
+                    Bundle datos = msg.getData();
+                    try {
+                        JSONObject respuesta = new JSONObject(datos.getString("MENSAJE"));
+                        String estadoPeticion = respuesta.getString("success");
+
+                        if (estadoPeticion.equals("false")) {
+                            Log.i(PROYECTO + "->" + TAG, "Fallo de refresh");
+                            return;
+                        } else {
+                            Log.i(PROYECTO + "->" + TAG, "Refresh exitoso");
+                            token = respuesta.getString("token");
+                            tokenRefresh = respuesta.getString("token_refresh");
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
     }
 
     private void nivelBateria() {
@@ -148,7 +191,6 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
             return "NO";
         if (value >= 337.5 && value < 360)
             return "N";
-
         return "Errror";
     }
 
@@ -190,15 +232,26 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         Log.i(PROYECTO + "->" + TAG, "Actualizacion de token finalizada");
     }
 
-    private void detenerSensores() {
+    private synchronized void detenerSensores() {
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER));
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT));
         mSensorManager.unregisterListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION));
     }
 
-    private void initSensores() {
+    private synchronized void initSensores() {
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER), SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_ORIENTATION), SensorManager.SENSOR_DELAY_NORMAL);
         mSensorManager.registerListener(this, mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    public synchronized void eventoRegistrarOrientacion(View view) {
+    }
+
+    public synchronized void eventoRegistrarLuz(View view) {
+        Date date = new Date();
+        DateFormat.getDateTimeInstance().format(date);
+    }
+
+    public void eventoRegistrarAcelerometro(View view) {
     }
 }
