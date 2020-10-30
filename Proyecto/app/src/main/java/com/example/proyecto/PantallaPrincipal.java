@@ -11,6 +11,8 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,6 +42,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     private Handler handlerRefresh;
     private Handler handlerEvento;
+
     private JSONObject paqueteDatos;
     private SensorManager mSensorManager;
 
@@ -67,18 +70,12 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        Log.i(PROYECTO + "->" + TAG, datosRecibidos.toString());
-
         nivelBateria();
-
         datosSensorAcelerometro = (TextView) findViewById(R.id.textViewAcelerometro);
         datosSensorLuz = (TextView) findViewById(R.id.textViewLuz);
         datosGiroscopo = (TextView) findViewById(R.id.textViewOrientacion);
-
         mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         initSensores();
-
         this.tokenRefresh = null;
         try {
             this.tokenRefresh = datosRecibidos.getString("token_refresh");
@@ -86,7 +83,6 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
         final String refresh = tokenRefresh;
 
         timer = new Timer();
@@ -95,8 +91,10 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
             public void run() {
                 Date date = new Date();
                 Log.i(PROYECTO + "->" + TAG, "Se va a actualizar el token: " + DateFormat.getDateTimeInstance().format(date) + ":" + refresh);
-                HiloConexion threadConexion = new HiloConexion(URI_REFRESH, null, handlerRefresh, "PUT", "Content-Type", "application/json", "Authorization", refresh);
-                threadConexion.start();
+                if (verificarConexion()) {
+                    HiloConexion threadConexion = new HiloConexion(URI_REFRESH, null, handlerRefresh, "PUT", "Content-Type", "application/json", "Authorization", refresh);
+                    threadConexion.start();
+                }
             }
         };
         timer.schedule(refreshToken, 60000, 180000);
@@ -180,14 +178,12 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                     datosSensorAcelerometro.setText(txt);
                     this.datosAcel = txt;
                     break;
-
                 case Sensor.TYPE_LIGHT:
                     txt = "Luz ambiente: ";
                     txt += event.values[0] + "lx";
                     datosSensorLuz.setText(txt);
                     this.datosLuz = txt;
                     break;
-
                 case Sensor.TYPE_ORIENTATION:
                     txt = "Orientacion:\n";
                     txt += "Acimut: " + getAcimut(event.values[0]) + "\n";
@@ -197,7 +193,6 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                     this.datosOri = txt;
                     break;
             }
-
         }
     }
 
@@ -275,13 +270,27 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     }
 
     public void eventoRegistrarOrientacion(View view) {
+        Date date = new Date();
+        paqueteDatos = new JSONObject();
+        try {
+            paqueteDatos.put("env", "TEST");
+            paqueteDatos.put("type_events", "Lectura de sensor");
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + "Datos: " + this.datosOri);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (verificarConexion()) {
+            HiloConexion hiloOrientacion = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, "POST", "Content-Type", "application/json", "Authorization", "Bearer" + " " + token);
+            hiloOrientacion.start();
+        } else {
+            Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     public void eventoRegistrarLuz(View view) {
         Date date = new Date();
-
         paqueteDatos = new JSONObject();
-
         try {
             paqueteDatos.put("env", "TEST");
             paqueteDatos.put("type_events", "Lectura de sensor");
@@ -289,10 +298,41 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        HiloConexion hiloLuz = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, "POST", "Content-Type", "application/json", "Authorization", token);
-        hiloLuz.start();
+        if (verificarConexion()) {
+            HiloConexion hiloLuz = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, "POST", "Content-Type", "application/json", "Authorization", "Bearer" + " " + token);
+            hiloLuz.start();
+        } else {
+            Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
+            return;
+        }
     }
 
     public void eventoRegistrarAcelerometro(View view) {
+        Date date = new Date();
+        paqueteDatos = new JSONObject();
+        try {
+            paqueteDatos.put("env", "TEST");
+            paqueteDatos.put("type_events", "Lectura de sensor");
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + "Datos: " + this.datosOri);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        if (verificarConexion()) {
+            HiloConexion hiloAcel = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, "POST", "Content-Type", "application/json", "Authorization", "Bearer" + " " + token);
+            hiloAcel.start();
+        } else {
+            Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
+            return;
+        }
+    }
+
+    public boolean verificarConexion() {
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

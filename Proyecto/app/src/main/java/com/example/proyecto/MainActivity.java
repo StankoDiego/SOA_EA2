@@ -18,14 +18,14 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     private EditText editTextUsuario;
     private EditText editTextContraseña;
-    
+
     private TextView textViewUsuario;
     private TextView textViewContraseña;
-    
+
     private JSONObject paqueteDatos;
     private Handler handlerMain;
     private static final String URI_LOGIN = "http://so-unlam.net.ar/api/api/login";
@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity{
 
         paqueteDatos = new JSONObject();
 
-        this.handlerMain = new Handler(){
+        this.handlerMain = new Handler() {
             @Override
             public void handleMessage(Message msg) {
                 Bundle datos = msg.getData();
@@ -77,17 +77,17 @@ public class MainActivity extends AppCompatActivity{
         String usuario = editTextUsuario.getText().toString();
         String pass = editTextContraseña.getText().toString();
 
-        if (usuario.isEmpty()){
+        if (usuario.isEmpty()) {
             textViewUsuario.setText("Completar por favor");
             camposVacios = true;
-        }else{
+        } else {
             textViewUsuario.setText("");
         }
 
-        if (pass.isEmpty()){
+        if (pass.isEmpty()) {
             textViewContraseña.setText("Completar por favor");
             camposVacios = true;
-        }else{
+        } else {
             textViewContraseña.setText("");
         }
 
@@ -103,17 +103,14 @@ public class MainActivity extends AppCompatActivity{
             e.printStackTrace();
         }
 
-        ConnectivityManager cm = (ConnectivityManager)getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()){
+        if (verificarConexion()) {
             Toast.makeText(this, "Conexion: Disponible", Toast.LENGTH_SHORT).show();
-        }else{
+        } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
             return;
         }
         Log.i(PROYECTO + "->" + TAG, "Se va a loguear un usuario");
-        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type","application/json", null, null);
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type", "application/json", null, null);
         hiloLogin.start();
     }
 
@@ -121,6 +118,16 @@ public class MainActivity extends AppCompatActivity{
         Log.i(PROYECTO + "->" + TAG, "Ingresando a pantalla de registro");
         Intent intentRegistrarActivity = new Intent(this, RegistrarActivity.class);
         startActivity(intentRegistrarActivity);
+    }
+
+    public boolean verificarConexion() {
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
 

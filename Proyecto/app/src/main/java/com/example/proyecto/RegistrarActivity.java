@@ -70,7 +70,6 @@ public class RegistrarActivity extends AppCompatActivity {
                         return;
                     } else {
                         Intent i = new Intent(getBaseContext(), PantallaPrincipal.class);
-                        //i.putExtra("MENSAJE", datos.getString("MENSAJE"));
                         i.putExtra("MENSAJE", datos);
                         Log.i(PROYECTO + "->" + TAG, "Registro exitoso");
                         startActivity(i);
@@ -83,9 +82,7 @@ public class RegistrarActivity extends AppCompatActivity {
     }
 
     public void eventoRegistrar(View view) {
-
         if (validarCampos()) return;
-
         paqueteDatos = new JSONObject();
 
         try {
@@ -100,10 +97,7 @@ public class RegistrarActivity extends AppCompatActivity {
             e.printStackTrace();
         }
 
-        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
-
-        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+        if (verificarConexion()) {
             Toast.makeText(this, "Conexion: Disponible", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
@@ -146,5 +140,14 @@ public class RegistrarActivity extends AppCompatActivity {
         return errorDatos;
     }
 
+    public boolean verificarConexion() {
+        ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
 

@@ -49,12 +49,10 @@ public class HiloConexion extends Thread {
             urlConnection = (HttpURLConnection) mUrl.openConnection();
 
             if (key2 != null && value2 != null) {
-                urlConnection.setRequestProperty(this.key2, "Bearer" + " " + this.value2);
+                urlConnection.setRequestProperty(this.key2, this.value2);
             }
 
             urlConnection.setRequestProperty(this.key, this.value);
-
-            Log.i(PROYECTO + "->" + TAG, urlConnection.getRequestProperties().toString());
             urlConnection.setDoOutput(true);
             urlConnection.setDoInput(true);
             urlConnection.setConnectTimeout(5000);
