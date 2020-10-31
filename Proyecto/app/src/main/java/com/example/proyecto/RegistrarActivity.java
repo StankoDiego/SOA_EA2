@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
@@ -29,10 +30,14 @@ public class RegistrarActivity extends AppCompatActivity {
     private Handler handlerRegistar;
 
     private static final String TAG = "REGISTRAR";
-    private static final int LONG_MIN_PASS = 8;
-
     private static final String PROYECTO = "PROYECTO";
+
+    private static final int LONG_MIN_PASS = 8;
     private static final String URI_REGISTRAR = "http://so-unlam.net.ar/api/api/register";
+    private static final String PETICION = "POST";
+    private static final String HEADER_KEY = "Content-Type";
+    private static final String HEADER_VALUE = "application/json";
+    private static final String AMBIENTE = "PROD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +91,7 @@ public class RegistrarActivity extends AppCompatActivity {
         paqueteDatos = new JSONObject();
 
         try {
-            paqueteDatos.put("env", "TEST");
+            paqueteDatos.put("env", AMBIENTE);
             paqueteDatos.put("name", editsText.get(0).getText().toString());
             paqueteDatos.put("lastname", editsText.get(1).getText().toString());
             paqueteDatos.put("dni", editsText.get(2).getText().toString());
@@ -105,7 +110,7 @@ public class RegistrarActivity extends AppCompatActivity {
         }
 
         Log.i(PROYECTO + "->" + TAG, "Se va a registrar un usuario");
-        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar, "POST", "Content-Type", "application/json", null, null);
+        HiloConexion hiloRegistrar = new HiloConexion(URI_REGISTRAR, paqueteDatos, handlerRegistar, PETICION, HEADER_KEY, HEADER_VALUE, null, null);
         hiloRegistrar.start();
     }
 
@@ -149,5 +154,6 @@ public class RegistrarActivity extends AppCompatActivity {
             return false;
         }
     }
+
 }
 

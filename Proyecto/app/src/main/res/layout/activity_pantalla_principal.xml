@@ -46,7 +46,7 @@
         android:layout_marginTop="112dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/button_rounded"
-        android:text="Registrar\ndatos"
+        android:text="@string/registrar_ndatos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:onClick="eventoRegistrarAcelerometro"/>
@@ -58,7 +58,7 @@
         android:layout_marginTop="100dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/button_rounded"
-        android:text="Registrar\ndatos"
+        android:text="@string/registrar_ndatos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.9"
         app:layout_constraintStart_toEndOf="@+id/textViewLuz"
@@ -72,11 +72,25 @@
         android:layout_marginTop="100dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/button_rounded"
-        android:text="Registrar\ndatos"
+        android:text="@string/registrar_ndatos"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.916"
         app:layout_constraintStart_toEndOf="@+id/textViewOrientacion"
         app:layout_constraintTop_toBottomOf="@+id/buttonLuz"
         android:onClick="eventoRegistrarOrientacion"/>
+
+    <Button
+        android:id="@+id/buttonDatos"
+        android:layout_width="258dp"
+        android:layout_height="62dp"
+        android:layout_marginBottom="68dp"
+        android:background="@drawable/button_rounded"
+        android:onClick="eventoMostrarDatos"
+        android:text="@string/mostrardatos"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewOrientacion" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -31,12 +31,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String URI_LOGIN = "http://so-unlam.net.ar/api/api/login";
     private static final String TAG = "MAIN";
     private static final String PROYECTO = "PROYECTO";
+    private static final String PETICION = "POST";
+    private static final String HEADER_KEY = "Content-Type";
+    private static final String HEADER_VALUE = "application/json";
 
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         editTextUsuario = (EditText) findViewById(R.id.editTextEmail);
         editTextContraseña = (EditText) findViewById(R.id.editTextContraseña);
 
@@ -44,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         textViewContraseña = (TextView) findViewById(R.id.textViewContraseña);
 
         paqueteDatos = new JSONObject();
+
 
         this.handlerMain = new Handler() {
             @Override
@@ -96,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         paqueteDatos = new JSONObject();
 
         try {
-            paqueteDatos.put("env", "PROD");
             paqueteDatos.put("email", usuario);
             paqueteDatos.put("password", pass);
         } catch (JSONException e) {
@@ -110,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         Log.i(PROYECTO + "->" + TAG, "Se va a loguear un usuario");
-        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, "POST", "Content-Type", "application/json", null, null);
+        HiloConexion hiloLogin = new HiloConexion(URI_LOGIN, paqueteDatos, handlerMain, PETICION, HEADER_KEY, HEADER_VALUE, null, null);
         hiloLogin.start();
     }
 
@@ -120,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intentRegistrarActivity);
     }
 
-    public boolean verificarConexion() {
+    private boolean verificarConexion() {
         ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         if (activeNetwork != null && activeNetwork.isConnectedOrConnecting()) {
