@@ -159,9 +159,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                             String descripcion = eventosRespuesta.getString("description");
                             String dni = eventosRespuesta.getString("dni");
 
-                            Set<String> info = new LinkedHashSet<>();
-                            info.add(descripcion);
-                            info.add(dni);
+                            String info = dni + ";" + descripcion;
                             escribirSharedPreferences(info);
 
                             Log.i(PROYECTO + "->" + TAG, "Registro de evento OK");
@@ -174,12 +172,11 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         };
     }
 
-    private void escribirSharedPreferences(Set info) {
+    private void escribirSharedPreferences(String info) {
         SharedPreferences preferences = getSharedPreferences("EventosRegistrados", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         int id = preferences.getAll().size();
-        Log.i(PROYECTO + "->" + String.valueOf(id), String.valueOf(id));
-        editor.putStringSet(String.valueOf(id + 1), info);
+        editor.putString(String.valueOf(id + 1), info);
         editor.commit();
     }
 
@@ -320,7 +317,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         try {
             paqueteDatos.put("env", AMBIENTE_EVENTO);
             paqueteDatos.put("type_events", "Lectura de sensor");
-            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + ";" + this.datosOri);
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + " " + this.datosOri);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -339,7 +336,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         try {
             paqueteDatos.put("env", AMBIENTE_EVENTO);
             paqueteDatos.put("type_events", "Lectura de sensor");
-            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + ";" + this.datosLuz);
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + " " + this.datosLuz);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -358,7 +355,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         try {
             paqueteDatos.put("env", AMBIENTE_EVENTO);
             paqueteDatos.put("type_events", "Lectura de sensor");
-            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + ";" + this.datosAcel);
+            paqueteDatos.put("description", DateFormat.getDateTimeInstance().format(date) + " " + this.datosAcel);
         } catch (JSONException e) {
             e.printStackTrace();
         }

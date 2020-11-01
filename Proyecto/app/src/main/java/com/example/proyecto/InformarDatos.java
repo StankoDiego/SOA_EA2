@@ -1,45 +1,30 @@
 package com.example.proyecto;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.drawable.ShapeDrawable;
-import android.graphics.drawable.shapes.RectShape;
-import android.os.Build;
 import android.os.Bundle;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
-import android.widget.TableRow;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class InformarDatos extends AppCompatActivity {
 
     private static final String PROYECTO = "PROYECTO";
     private static final String TAG = "INFORMAR DATOS";
 
-    private ArrayList<String[]> eventos;
+    private ArrayList<String> eventos;
     private Spinner spinnerDni;
 
     private LinearLayout table;
@@ -64,15 +49,13 @@ public class InformarDatos extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, opciones);
         spinnerDni.setAdapter(adapter);
 
-        //PROBANDO
-
     }
 
     private String[] obtenerOpciones() {
         LinkedHashSet<String> aux = new LinkedHashSet<>();
         aux.add("Seleccionar DNI...");
         for (int i = 0; i < this.eventos.size(); i++) {
-            aux.add(this.eventos.get(i)[1]);
+            aux.add(this.eventos.get(i).split(";")[0]);
         }
         String[] a = new String[aux.size()];
         a = aux.toArray(a);
@@ -84,21 +67,14 @@ public class InformarDatos extends AppCompatActivity {
 
         this.eventos = new ArrayList<>();
         for (String index : keys) {
-            Set<String> aux = (Set<String>) datos.get(index);
-
-            String[] array = new String[aux.size()];
-            int i = 0;
-            for (String a : aux) {
-                array[i++] = a;
-            }
-            this.eventos.add(array);
+            String aux = (String) datos.get(index);
+            this.eventos.add(aux);
         }
     }
 
     public void listarDatos(View view) {
         String itemSeleccionado = this.spinnerDni.getSelectedItem().toString();
-        List<String[]> elemetrosFiltrados = extraerElementosFiltrados(itemSeleccionado);
-        String[] encabezado = {"DATOS", "DNI"};
+        List<String> elemetrosFiltrados = extraerElementosFiltrados(itemSeleccionado);
         table.removeAllViews();
         if (elemetrosFiltrados.size() == 0) return;
 
@@ -106,29 +82,39 @@ public class InformarDatos extends AppCompatActivity {
             LinearLayout fila = new LinearLayout(getBaseContext());
             fila.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 300));
 
-            for (int cantTextViews = 0; cantTextViews < 2; cantTextViews++) {
-                TextView text = new TextView(getBaseContext());
-                text.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100));
-                text.setTextColor(Color.WHITE);
-                int indice = encabezado.length - cantTextViews - 1;
-                String info = elemetrosFiltrados.get(cantFilas)[indice];
-                String aux = encabezado[indice];
-                text.setText(aux + ":" + info);
-                fila.setOrientation(LinearLayout.VERTICAL);
-                fila.addView(text);
+            TextView textDni = new TextView(getBaseContext());
+            textDni.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100));
+            textDni.setTextColor(Color.WHITE);
+            textDni.setText("DNI: " + itemSeleccionado);
 
-            }
+            TextView textInfo = new TextView(getBaseContext());
+            textInfo.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, 100));
+            textInfo.setTextColor(Color.WHITE);
+            textInfo.setText("DATOS: " + elemetrosFiltrados.get(cantFilas));
+
+            fila.setOrientation(LinearLayout.VERTICAL);
+            fila.addView(textDni);
+            fila.addView(textInfo);
+
             table.addView(fila);
         }
     }
 
-    private List<String[]> extraerElementosFiltrados(String itemSeleccionado) {
-        List<String[]> listAux = new ArrayList<>();
+    private List<String> recortarElemento(List<String> elemetrosFiltrados, int i) {
+        List<String> aux = new ArrayList<>();
+        for (String index : elemetrosFiltrados) {
+            aux.add(index.split(";")[i]);
+        }
+        return aux;
+    }
+
+    private List<String> extraerElementosFiltrados(String itemSeleccionado) {
+        List<String> listAux = new ArrayList<>();
         if (itemSeleccionado.equals("Seleccionar DNI...")) return listAux;
 
         for (int i = 0; i < this.eventos.size(); i++) {
-            String[] aux = this.eventos.get(i);
-            if (aux[1].equals(itemSeleccionado)) {
+            String aux = this.eventos.get(i).split(";")[1];
+            if (this.eventos.get(i).split(";")[0].equals(itemSeleccionado)) {
                 listAux.add(aux);
             }
         }
