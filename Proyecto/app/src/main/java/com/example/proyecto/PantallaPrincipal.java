@@ -157,14 +157,11 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                         } else {
                             JSONObject eventosRespuesta = (JSONObject) respuesta.get("event");
                             String descripcion = eventosRespuesta.getString("description");
-                            String tipoEvento = eventosRespuesta.getString("type_events");
                             String dni = eventosRespuesta.getString("dni");
-                            String id = eventosRespuesta.getString("id");
 
                             Set<String> info = new LinkedHashSet<>();
-                            info.add(dni);
-                            info.add(tipoEvento);
                             info.add(descripcion);
+                            info.add(dni);
                             escribirSharedPreferences(info);
 
                             Log.i(PROYECTO + "->" + TAG, "Registro de evento OK");

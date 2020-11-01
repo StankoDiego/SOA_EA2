@@ -13,4 +13,5 @@
     <string name="crear_usuario">Crear usuario</string>
     <string name="mostrardatos">MostrarDatos</string>
     <string name="registrar_ndatos">Registrar\ndatos</string>
+    <string name="buscar">Buscar</string>
 </resources>
