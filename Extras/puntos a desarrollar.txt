@@ -21,13 +21,13 @@ Aplicacion Android:
     [X]  Desarrollar un sistema de registro de usuario y login realizando las peticiones a un servidor.
     [X]  En pantallas de registro de usuario y login verificar estado de la conexion, si no hay conexion se debe informar.
     [X]  Al logearse se debe informar el estado de la carga de la bateria.
-    []  Implementar ejecuciones en Background visto en clases.
-    []  Aplicar un mecanismo de sincronizacion.
-    []  Mostrar informacion del acelerometro o giroscopio ademas de otro sensor de la clase SensorManager.
-    []  Registrar en el servidor diferentes eventos ocurridos durante su ejecucion.
+    [X]  Implementar ejecuciones en Background visto en clases.
+    [X]  Aplicar un mecanismo de sincronizacion.
+    [X]  Mostrar informacion del acelerometro o giroscopio ademas de otro sensor de la clase SensorManager.
+    [X]  Registrar en el servidor diferentes eventos ocurridos durante su ejecucion.
     []  Debe ser tolerante a fallos.
 
     Puntos Extras:
-        []  Asignar un token para el acceso de sesion de 30min, realizar actualizacion del Token.
-        []  Listar el conjunto de eventos de un sensor y persistirlo para volver a mostrarse en cada inicio de sesion.
+        [X]  Asignar un token para el acceso de sesion de 30min, realizar actualizacion del Token.
+        [X]  Listar el conjunto de eventos de un sensor y persistirlo para volver a mostrarse en cada inicio de sesion.
         []  Implementar servicios externos.

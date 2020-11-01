@@ -1,5 +1,6 @@
 package com.example.proyecto;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
@@ -8,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -20,6 +23,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -28,13 +32,8 @@ import org.json.JSONObject;
 
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.TreeSet;
 
 public class PantallaPrincipal extends AppCompatActivity implements SensorEventListener {
 
@@ -48,6 +47,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
 
     private Handler handlerRefresh;
     private Handler handlerEvento;
+    private Handler handlerImg;
 
     private JSONObject paqueteDatos;
     private SensorManager mSensorManager;
@@ -168,6 +168,19 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
                         e.printStackTrace();
                     }
                 }
+            }
+        };
+
+        this.handlerImg = new Handler() {
+            @Override
+            public void handleMessage(@NonNull Message msg) {
+                Bundle datos = msg.getData();
+
+                byte[] b = datos.getByteArray("MENSAJE");
+                Bitmap bmp = BitmapFactory.decodeByteArray(b, 0, b.length);
+                ImageView imageView = (ImageView) findViewById(R.id.imageView);
+                imageView.setImageBitmap(bmp);
+                imageView.setVisibility(View.VISIBLE);
             }
         };
     }
@@ -323,6 +336,8 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         }
         if (verificarConexion()) {
             HiloConexion hiloOrientacion = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, PETICION_EVENTO, HEADER_KEY, HEADER_VALUE, HEADER_KEY2, HEADER_VALUE2 + " " + token);
+            HiloConexionImag hiloConexionImag = new HiloConexionImag(handlerImg, this.datosOri);
+            hiloConexionImag.start();
             hiloOrientacion.start();
         } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
@@ -342,6 +357,9 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         }
         if (verificarConexion()) {
             HiloConexion hiloLuz = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, PETICION_EVENTO, HEADER_KEY, HEADER_VALUE, HEADER_KEY2, HEADER_VALUE2 + " " + token);
+            HiloConexionImag hiloConexionImag = new HiloConexionImag(handlerImg, this.datosLuz);
+            hiloConexionImag.start();
+
             hiloLuz.start();
         } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
@@ -352,6 +370,7 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
     public void eventoRegistrarAcelerometro(View view) {
         Date date = new Date();
         paqueteDatos = new JSONObject();
+        JSONObject paqueteImg = new JSONObject();
         try {
             paqueteDatos.put("env", AMBIENTE_EVENTO);
             paqueteDatos.put("type_events", "Lectura de sensor");
@@ -361,6 +380,8 @@ public class PantallaPrincipal extends AppCompatActivity implements SensorEventL
         }
         if (verificarConexion()) {
             HiloConexion hiloAcel = new HiloConexion(URI_EVENT, paqueteDatos, handlerEvento, PETICION_EVENTO, HEADER_KEY, HEADER_VALUE, HEADER_KEY2, HEADER_VALUE2 + " " + token);
+            HiloConexionImag hiloConexionImag = new HiloConexionImag(handlerImg, this.datosAcel);
+            hiloConexionImag.start();
             hiloAcel.start();
         } else {
             Toast.makeText(this, "Conexion: No disponible", Toast.LENGTH_SHORT).show();
