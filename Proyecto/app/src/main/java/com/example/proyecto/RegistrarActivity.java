@@ -78,6 +78,7 @@ public class RegistrarActivity extends AppCompatActivity {
                         i.putExtra("MENSAJE", datos);
                         Log.i(PROYECTO + "->" + TAG, "Registro exitoso");
                         startActivity(i);
+                        finish();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();

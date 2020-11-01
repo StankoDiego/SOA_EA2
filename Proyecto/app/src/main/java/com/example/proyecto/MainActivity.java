@@ -65,13 +65,14 @@ public class MainActivity extends AppCompatActivity {
                         i.putExtra("MENSAJE", datos);
                         Log.i(PROYECTO + "->" + TAG, "Login exitoso");
                         startActivity(i);
+                        finish();
+
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         };
-
     }
 
     public void eventoIngresar(View view) {
